@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_delivery_report_pdf" model="ir.actions.report">
+        <field name="name">Delivery Report</field>
+        <field name="model">stock.picking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">delivery_report_wizard.report_delivery_document</field>
+        <field name="report_file">delivery_report_wizard.report_delivery_document</field>
+        <field name="print_report_name">'Delivery Report - %s' % (object.name)</field>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
+    </record>
+
+</odoo>

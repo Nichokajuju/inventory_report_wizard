@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_delivery_document">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="web.html_container">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+
+                        <!-- HEADER -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <h2 style="color:#2c3e50; border-bottom:3px solid #3498db; padding-bottom:6px;">
+                                    Delivery Report
+                                </h2>
+                                <p style="font-size:11px; color:#888;">
+                                    Reference: <strong><t t-esc="doc.name"/></strong>
+                                </p>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div style="background:#f8f9fa; padding:10px; border-radius:6px; border-left:4px solid #3498db;">
+                                    <strong>Scheduled Date:</strong>
+                                    <span t-esc="doc.scheduled_date"
+                                          t-options='{"widget": "date"}'/><br/>
+                                    <strong>Status:</strong>
+                                    <t t-if="doc.state == 'done'"> Done</t>
+                                    <t t-elif="doc.state == 'assigned'"> Ready</t>
+                                    <t t-elif="doc.state == 'waiting'"> Waiting</t>
+                                    <t t-elif="doc.state == 'confirmed'"> Confirmed</t>
+                                    <t t-else=""><t t-esc="doc.state"/></t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DELIVERY INFO -->
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless"
+                                       style="font-size:12px;">
+                                    <tr>
+                                        <td style="width:45%; font-weight:600; color:#555;">
+                                            Operation Type:
+                                        </td>
+                                        <td><t t-esc="doc.picking_type_id.name or '-'"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:600; color:#555;">
+                                            Source Location:
+                                        </td>
+                                        <td>
+                                            <t t-esc="doc.location_id.complete_name or '-'"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:600; color:#555;">
+                                            Destination:
+                                        </td>
+                                        <td>
+                                            <strong>
+                                                <t t-esc="doc.location_dest_id.complete_name or '-'"/>
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:600; color:#555;">
+                                            Effective Date:
+                                        </td>
+                                        <td>
+                                            <t t-esc="doc.date_done"
+                                               t-options='{"widget": "datetime"}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless"
+                                       style="font-size:12px;">
+                                    <tr>
+                                        <td style="width:45%; font-weight:600; color:#555;">
+                                            Delivery Address:
+                                        </td>
+                                        <td>
+                                            <t t-esc="doc.partner_id.name or '-'"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:600; color:#555;">
+                                            Responsible:
+                                        </td>
+                                        <td>
+                                            <t t-esc="doc.user_id.name or '-'"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight:600; color:#555;">
+                                            Source Document:
+                                        </td>
+                                        <td>
+                                            <t t-esc="doc.origin or '-'"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- PRODUCT LINES TABLE -->
+                        <h5 style="color:#2c3e50; margin-top:16px; margin-bottom:8px;">
+                            Items Delivered
+                        </h5>
+                        <table class="table table-sm table-bordered"
+                               style="font-size:11px;">
+                            <thead style="background-color:#3498db; color:#fff;">
+                                <tr>
+                                    <th style="width:5%;">#</th>
+                                    <th style="width:35%;">Product</th>
+                                    <th style="width:15%;">Lot / Serial</th>
+                                    <th style="width:12%;" class="text-end">Demand</th>
+                                    <th style="width:12%;" class="text-end">Done Qty</th>
+                                    <th style="width:10%;">Unit</th>
+                                    <th style="width:11%;" class="text-end">Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="line_index" t-value="0"/>
+                                <t t-foreach="doc.move_ids_without_package" t-as="move">
+                                    <t t-set="line_index" t-value="line_index + 1"/>
+                                    <tr t-att-style="'background:#f9f9f9;' if line_index % 2 == 0 else ''">
+                                        <td><t t-esc="line_index"/></td>
+                                        <td>
+                                            <strong>
+                                                <t t-esc="move.product_id.display_name"/>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            <t t-foreach="move.move_line_ids" t-as="ml">
+                                                <t t-if="ml.lot_id">
+                                                    <t t-esc="ml.lot_id.name"/>
+                                                </t>
+                                            </t>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="'%.2f' % (move.product_uom_qty or 0)"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <strong>
+                                                <t t-esc="'%.2f' % (move.quantity or 0)"/>
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            <t t-esc="move.product_uom.name or '-'"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <t t-esc="'%.4f' % (move.price_unit or 0)"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- TOTALS -->
+                        <div class="row" style="margin-top:10px;">
+                            <div class="col-7"></div>
+                            <div class="col-5">
+                                <table class="table table-sm" style="font-size:12px;">
+                                    <tr style="background:#eaf4fb;">
+                                        <td style="font-weight:600;">Total Lines:</td>
+                                        <td class="text-end">
+                                            <t t-esc="len(doc.move_ids_without_package)"/>
+                                        </td>
+                                    </tr>
+                                    <tr style="background:#d5f5e3; font-weight:700;">
+                                        <td>Total Cost:</td>
+                                        <td class="text-end">
+                                            $<t t-esc="'%.2f' % sum(
+                                                m.price_unit * m.quantity
+                                                for m in doc.move_ids_without_package
+                                            )"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- NOTES -->
+                        <t t-if="doc.note">
+                            <div style="margin-top:12px; padding:8px; background:#fffde7;
+                                        border-left:4px solid #f39c12; border-radius:4px;">
+                                <strong>Notes:</strong>
+                                <t t-out="doc.note"/>
+                            </div>
+                        </t>
+
+                        <!-- SIGNATURE BLOCK -->
+                        <div class="row" style="margin-top:50px;">
+                            <div class="col-4 text-center">
+                                <div style="border-top:1px solid #333; padding-top:4px; font-size:10px;">
+                                    Prepared By
+                                </div>
+                            </div>
+                            <div class="col-4"></div>
+                            <div class="col-4 text-center">
+                                <div style="border-top:1px solid #333; padding-top:4px; font-size:10px;">
+                                    Received By
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Page break between deliveries -->
+                        <t t-if="not doc_last">
+                            <div style="page-break-after:always;"/>
+                        </t>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="delivery_report_wizard_form_view" model="ir.ui.view">
+        <field name="name">delivery.report.wizard.form</field>
+        <field name="model">delivery.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Delivery Report">
+
+                <div class="alert alert-info" role="alert">
+                    <i class="fa fa-info-circle"/>
+                    Use the filters below to narrow down deliveries, then click
+                    <b>Generate Report</b> to produce a printable PDF.
+                    All filter fields are optional except the date range.
+                </div>
+
+                <group string="Date Range" col="2">
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
+
+                <group string="Filters" col="2">
+                    <field name="state"/>
+                    <field name="operation_type_ids"
+                           widget="many2many_tags"
+                           options="{'no_create': True}"/>
+                    <field name="location_id"
+                           options="{'no_create': True}"/>
+                    <field name="location_dest_id"
+                           options="{'no_create': True}"/>
+                    <field name="partner_id"
+                           options="{'no_create': True}"/>
+                </group>
+
+                <footer>
+                    <button name="action_generate_report"
+                            string="Generate Report"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="action_open_delivery_report_wizard" model="ir.actions.act_window">
+        <field name="name">Delivery Report</field>
+        <field name="res_model">delivery.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="delivery_report_wizard_form_view"/>
+    </record>
+
+</odoo>

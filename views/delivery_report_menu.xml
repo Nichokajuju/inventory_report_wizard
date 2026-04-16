@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem
+        id="menu_delivery_report_wizard"
+        name="Delivery Report"
+        parent="stock.menu_stock_reports"
+        action="delivery_report_wizard.action_open_delivery_report_wizard"
+        sequence="25"
+    />
+
+</odoo>
